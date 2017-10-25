@@ -1,0 +1,113 @@
+version: '3'
+
+services:
+  db:
+    image: mariadb
+    container_name: mariadb
+    restart: always
+    volumes:
+      - db:/var/lib/mysql
+    env_file:
+      - nextcloud.env
+
+  redis:
+    container_name: redis
+    image: redis
+    restart: always
+
+  app:
+    build: ./app
+    restart: always
+    container_name: nextcloud
+    volumes:
+      - nextcloud:/var/www/html
+    env_file:
+      - nextcloud.env
+    depends_on:
+      - db
+      - redis
+
+  web:
+    build: ./web
+    restart: always
+    container_name: web
+    volumes:
+      - nextcloud:/var/www/html:ro
+    environment:
+      VIRTUAL_HOST: "${VIRTUAL_HOST}"
+    depends_on:
+      - app
+    networks:
+      - proxy-tier
+      - default
+
+  cron:
+    build: ./app
+    container_name: cron
+    restart: always
+    volumes:
+      - nextcloud:/var/www/html
+    user: www-data
+    entrypoint: |
+      bash -c 'bash -s <<EOF
+        trap "break;exit" SIGHUP SIGINT SIGTERM
+
+        while [ ! -f /var/www/html/config/config.php ]; do
+          sleep 1
+        done
+
+        while true; do
+          php -f /var/www/html/cron.php
+          sleep 15m
+        done
+      EOF'
+    depends_on:
+      - db
+      - redis
+
+  proxy:
+    build: ./proxy
+    container_name: proxy
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      CERT_NAME: "${CERT_NAME}"
+    labels:
+      com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: "true"
+    volumes:
+      - ./certs:/etc/nginx/certs:ro
+      - conf.d:/etc/nginx/conf.d
+      - vhost.d:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - proxy-tier
+
+  letsencrypt-companion:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    container_name: nginx-letsencrypt
+    restart: always
+    volumes:
+      - ./certs:/etc/nginx/certs
+      - conf.d:/etc/nginx/conf.d
+      - vhost.d:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - proxy-tier
+    environment:
+      NGINX_PROXY_CONTAINER: "proxy"
+    depends_on:
+      - proxy
+
+volumes:
+  db:
+  nextcloud:
+  conf.d:
+  vhost.d:
+  html:
+
+networks:
+  proxy-tier:
