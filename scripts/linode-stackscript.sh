@@ -178,4 +178,4 @@ cd /opt/nextcloud
 
 docker network create proxy-tier
 
-make run
+make run VIRTUAL_HOST=${LETSENCRYPT_HOST}
