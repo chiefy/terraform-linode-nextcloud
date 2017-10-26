@@ -115,7 +115,7 @@ function system_add_host_entry {
 
 function setup_data_volume {
     local data_path=${1}
-    local mount_path=${2:-/mnt/nextcloud-data}
+    local mount_path=${2:-/mnt/nextcloud}
     mkfs.ext4 ${data_path}
     mkdir ${mount_path}
     mount ${data_path} ${mount_path}
@@ -184,7 +184,7 @@ MYSQL_HOST=db
 CERT_NAME=
 LETSENCRYPT_HOST=${LETSENCRYPT_HOST}
 LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
-NEXTCLOUD_DATA_DIR=/mnt/nextcloud-data
+NEXTCLOUD_DATA_DIR=/mnt/nextcloud
 NEXTCLOUD_ADMIN_USER=${USERNAME}
 NEXTCLOUD_ADMIN_PASSWORD=${PASSWORD}
 EOF
