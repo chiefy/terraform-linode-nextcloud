@@ -9,6 +9,7 @@
 # <UDF name="LETSENCRYPT_EMAIL"         Label="Let's Encrypt Email">
 # <UDF name="MYSQL_PASSWORD"            Label="MySQL Password" />
 # <UDF name="MYSQL_ROOT_PASSWORD"       Label="MySQL Root Password" />
+# <UDF name="DATA_FILE_PATH"            Label="Data Volume Path " />
 
 exec >/root/stackscript.log 2>/root/stackscript_error.log
 
@@ -111,6 +112,15 @@ function system_add_host_entry {
     echo $IPADDR $FQDN  >> /etc/hosts
 }
 
+
+function setup_data_volume {
+    local data_path=${1}
+    local mount_path=${2:-/mnt/nextcloud-data}
+    mkfs.ext4 ${data_path}
+    mkdir ${mount_path}
+    mount ${data_path} ${mount_path}
+}
+
 ################################################
 
 export DEBIAN_FRONTEND=noninteractive
@@ -159,6 +169,8 @@ pip install --upgrade pip docker-compose
 
 usermod -aG docker $USERNAME
 
+setup_data_volume ${DATA_FILE_PATH}
+
 mkdir -p /opt/nextcloud
 
 git clone -q https://github.com/chiefy/terraform-linode-nextcloud.git /opt/nextcloud
@@ -172,6 +184,9 @@ MYSQL_HOST=db
 CERT_NAME=
 LETSENCRYPT_HOST=${LETSENCRYPT_HOST}
 LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+NEXTCLOUD_DATA_DIR=/mnt/nextcloud-data
+NEXTCLOUD_ADMIN_USER=${USERNAME}
+NEXTCLOUD_ADMIN_PASSWORD=${PASSWORD}
 EOF
 
 cd /opt/nextcloud
