@@ -118,6 +118,8 @@ function setup_data_volume {
     local mount_path=${2:-/mnt/nextcloud}
     mkfs.ext4 ${data_path}
     mkdir ${mount_path}
+    chown root:33 ${mount_path}
+    chmod 770 ${mount_path}
     mount ${data_path} ${mount_path}
 }
 
