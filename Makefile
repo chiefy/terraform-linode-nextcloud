@@ -38,6 +38,8 @@ run-local: docker-compose/certs/default.crt
 	@cd docker-compose \
 	&& NEXTCLOUD_HOST=$(NEXTCLOUD_HOST) \
 	COLLABORA_HOST=$(COLLABORA_HOST) \
+	COLLABORA_USER=admin \
+	COLLABORA_PASSWORD=password \
 	CERT_NAME=default \
 	docker-compose up --build -d
 
@@ -46,6 +48,8 @@ run:
 	@cd docker-compose \
 	&& NEXTCLOUD_HOST=$(NEXTCLOUD_HOST) \
 	COLLABORA_HOST=$(COLLABORA_HOST) \
+	COLLABORA_USER=admin \
+	COLLABORA_PASSWORD=password \
 	docker-compose up --build -d
 
 .PHONY: stop

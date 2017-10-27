@@ -11,7 +11,9 @@ services:
     expose:
       - 9980
     environment:
-      domain: ${COLLABORA_HOST}
+      domain: "${COLLABORA_HOST}"
+      username: "${COLLABORA_USER}"
+      password: "${COLLABORA_PASSWORD}"
 
   collabora-nginx:
     build: ./collabora
