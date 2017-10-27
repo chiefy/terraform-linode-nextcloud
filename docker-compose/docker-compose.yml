@@ -60,6 +60,7 @@ services:
     container_name: web
     volumes:
       - nextcloud:/var/www/html:ro
+      - /mnt/nextcloud:/mnt/nextcloud
     environment:
       VIRTUAL_HOST: "${NEXTCLOUD_HOST}"
       LETSENCRYPT_HOST: "${NEXTCLOUD_HOST}"
