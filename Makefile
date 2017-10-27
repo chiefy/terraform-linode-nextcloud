@@ -5,7 +5,8 @@
 GOLANG := $(shell go version 2> /dev/null)
 TF := $(shell terraform version 2> /dev/null)
 
-VIRTUAL_HOST ?= localhost
+NEXTCLOUD_HOST ?= nextcloud.dev
+COLLABORA_HOST ?= collabora.dev
 
 PROVIDER_REPO := github.com/mrvovanness/terraform-provider-linode
 PROVIDER_PATH := $(GOPATH)/src/$(PROVIDER_REPO)
@@ -17,7 +18,7 @@ GOVENDOR_PATH := $(GOPATH)/src/$(GOVENDOR_REPO)
 LINODE_API_KEY :=
 SSH_PUB_KEY_FILE := $(HOME)/.ssh/id_rsa.pub
 
-.PHONY: golang tf init plan
+.PHONY: golang tf init plan run run-local
 
 docker-compose/certs:
 	@mkdir -p $@
@@ -29,20 +30,22 @@ docker-compose/certs/default.crt: docker-compose/certs
 	-days 365 \
 	-keyout docker-compose/certs/default.key \
 	-nodes \
-	-subj "/C=US/ST=Oregon/L=Portland/O=Localhost LLC/OU=Org/CN=$(VIRTUAL_HOST)" \
+	-subj "/C=US/ST=Oregon/L=Portland/O=Localhost LLC/OU=Org/CN=$(NEXTCLOUD_HOST)" \
 	-out $@
 
 .PHONY: run-local
 run-local: docker-compose/certs/default.crt
 	@cd docker-compose \
-	&& VIRTUAL_HOST=$(VIRTUAL_HOST) \
+	&& NEXTCLOUD_HOST=$(NEXTCLOUD_HOST) \
+	COLLABORA_HOST=$(COLLABORA_HOST) \
 	CERT_NAME=default \
 	docker-compose up --build -d
 
 .PHONY: run
 run:
 	@cd docker-compose \
-	&& VIRTUAL_HOST=$(VIRTUAL_HOST) \
+	&& NEXTCLOUD_HOST=$(NEXTCLOUD_HOST) \
+	COLLABORA_HOST=$(COLLABORA_HOST) \
 	docker-compose up --build -d
 
 .PHONY: stop

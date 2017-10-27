@@ -1,6 +1,32 @@
 version: '3'
 
 services:
+
+  collabora:
+    image: collabora/code
+    container_name: collabora
+    restart: always
+    cap_add:
+      - MKNOD
+    expose:
+      - 9980
+    environment:
+      domain: ${COLLABORA_HOST}
+
+  collabora-nginx:
+    build: ./collabora
+    restart: always
+    container_name: collabora-nginx
+    environment:
+      VIRTUAL_HOST: "${COLLABORA_HOST}"
+      LETSENCRYPT_HOST: "${COLLABORA_HOST}"
+      LETSENCRYPT_EMAIL: "${LETSENCRYPT_EMAIL}"
+    depends_on:
+      - collabora
+    networks:
+      - proxy-tier
+      - default
+
   db:
     image: mariadb
     container_name: mariadb
@@ -21,6 +47,7 @@ services:
     container_name: nextcloud
     volumes:
       - nextcloud:/var/www/html
+      - /mnt/nextcloud:/mnt/nextcloud
     env_file:
       - nextcloud.env
     depends_on:
@@ -33,9 +60,10 @@ services:
     container_name: web
     volumes:
       - nextcloud:/var/www/html:ro
-      - /mnt/nextcloud:/mnt/nextcloud
     environment:
-      VIRTUAL_HOST: "${VIRTUAL_HOST}"
+      VIRTUAL_HOST: "${NEXTCLOUD_HOST}"
+      LETSENCRYPT_HOST: "${NEXTCLOUD_HOST}"
+      LETSENCRYPT_EMAIL: "${LETSENCRYPT_EMAIL}"
     depends_on:
       - app
     networks:

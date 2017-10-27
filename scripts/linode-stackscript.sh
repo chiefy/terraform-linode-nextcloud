@@ -5,7 +5,8 @@
 # <UDF name="USERNAME"                  Label="Username" />
 # <UDF name="PASSWORD"                  Label="Password" />
 # <UDF name="SSH_KEY"                   Label="SSH Key" />
-# <UDF name="LETSENCRYPT_HOST"          Label="Let's Encrypt Domain">
+# <UDF name="NEXTCLOUD_HOST"            Label="Nextcloud Domain">
+# <UDF name="COLLABORA_HOST"            Label="Collabora Domain">
 # <UDF name="LETSENCRYPT_EMAIL"         Label="Let's Encrypt Email">
 # <UDF name="MYSQL_PASSWORD"            Label="MySQL Password" />
 # <UDF name="MYSQL_ROOT_PASSWORD"       Label="MySQL Root Password" />
@@ -137,7 +138,8 @@ user_add_sudo "$USERNAME" "$PASSWORD"
 user_add_pubkey "$USERNAME" "$SSH_KEY"
 system_set_hostname "$HOSTNAME"
 system_add_host_entry "$IPADDR" "$HOSTNAME"
-system_add_host_entry "$IPADDR" "$LETSENCRYPT_HOST"
+system_add_host_entry "$IPADDR" "$NEXTCLOUD_HOST"
+system_add_host_entry "$IPADDR" "$COLLABORA_HOST"
 service sshd restart
 
 # Install packages
@@ -184,8 +186,6 @@ MYSQL_PASSWORD=${MYSQL_PASSWORD}
 MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
 MYSQL_HOST=db
 CERT_NAME=
-LETSENCRYPT_HOST=${LETSENCRYPT_HOST}
-LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
 NEXTCLOUD_DATA_DIR=/mnt/nextcloud
 NEXTCLOUD_ADMIN_USER=${USERNAME}
 NEXTCLOUD_ADMIN_PASSWORD=${PASSWORD}
@@ -195,4 +195,4 @@ cd /opt/nextcloud
 
 docker network create proxy-tier
 
-make run VIRTUAL_HOST=${LETSENCRYPT_HOST}
+make run COLLABORA_HOST=${COLLABORA_HOST} NEXTCLOUD_HOST=${NEXTCLOUD_HOST}
