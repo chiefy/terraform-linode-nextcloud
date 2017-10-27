@@ -128,6 +128,7 @@ services:
       - proxy-tier
     environment:
       NGINX_PROXY_CONTAINER: "proxy"
+      ACME_CA_URI: "https://acme-staging.api.letsencrypt.org/directory"
     depends_on:
       - proxy
 
