@@ -3,7 +3,7 @@ version: '3'
 services:
 
   collabora:
-    image: collabora/code
+    build: ./collabora
     container_name: collabora
     restart: always
     cap_add:
