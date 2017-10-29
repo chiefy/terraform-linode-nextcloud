@@ -13,7 +13,6 @@ perl -pi -e "s/<server_name desc=\"Hostname:port of the server running loolwsd. 
 # Start loolwsd
 su -c "/usr/bin/loolwsd \
 --version \
---disable-ssl \
 --o:sys_template_path=/opt/lool/systemplate \
 --o:lo_template_path=/opt/collaboraoffice5.3 \
 --o:child_root_path=/opt/lool/child-roots \
