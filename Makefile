@@ -8,6 +8,10 @@ TF := $(shell terraform version 2> /dev/null)
 NEXTCLOUD_HOST ?= nextcloud.dev
 COLLABORA_HOST ?= collabora.dev
 
+AWS_ACCESS_KEY_ID ?= test
+AWS_SECRET_ACCESS_KEY ?= test
+AWS_DEFAULT_REGION ?= us-east-1
+
 PROVIDER_REPO := github.com/mrvovanness/terraform-provider-linode
 PROVIDER_PATH := $(GOPATH)/src/$(PROVIDER_REPO)
 

@@ -3,7 +3,7 @@ version: '3'
 services:
 
   collabora:
-    image: collabora/code
+    build: ./collabora
     container_name: collabora
     restart: always
     cap_add:
@@ -16,9 +16,9 @@ services:
       password: "${COLLABORA_PASSWORD}"
 
   collabora-nginx:
-    build: ./collabora
+    build: ./collabora-proxy
     restart: always
-    container_name: collabora-nginx
+    container_name: collabora-proxy
     environment:
       VIRTUAL_HOST: "${COLLABORA_HOST}"
       LETSENCRYPT_HOST: "${COLLABORA_HOST}"
@@ -43,8 +43,8 @@ services:
     image: redis
     restart: always
 
-  app:
-    build: ./app
+  nextcloud:
+    build: ./nextcloud
     restart: always
     container_name: nextcloud
     volumes:
@@ -56,10 +56,10 @@ services:
       - db
       - redis
 
-  web:
-    build: ./web
+  nextcloud-proxy:
+    build: ./nextcloud-proxy
     restart: always
-    container_name: web
+    container_name: nextcloud-proxy
     volumes:
       - nextcloud:/var/www/html:ro
       - /mnt/nextcloud:/mnt/nextcloud
@@ -68,13 +68,13 @@ services:
       LETSENCRYPT_HOST: "${NEXTCLOUD_HOST}"
       LETSENCRYPT_EMAIL: "${LETSENCRYPT_EMAIL}"
     depends_on:
-      - app
+      - nextcloud
     networks:
       - proxy-tier
       - default
 
   cron:
-    build: ./app
+    build: ./nextcloud
     container_name: cron
     restart: always
     volumes:
@@ -134,6 +134,17 @@ services:
       ACME_CA_URI: "https://acme-staging.api.letsencrypt.org/directory"
     depends_on:
       - proxy
+
+  s3sync:
+    image: vladgh/s3sync
+    container_name: s3sync
+    volumes:
+      - /mnt/nextcloud:/data:ro
+    env_file:
+      - s3sync.env
+    environment:
+      SYNCDIR: "/data"
+    command: "cron"
 
 volumes:
   db:
