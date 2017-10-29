@@ -135,16 +135,16 @@ services:
     depends_on:
       - proxy
 
-  s3sync:
-    image: vladgh/s3sync
-    container_name: s3sync
-    volumes:
-      - /mnt/nextcloud:/data:ro
-    env_file:
-      - s3sync.env
-    environment:
-      SYNCDIR: "/data"
-    command: "cron"
+#  s3sync:
+#    image: vladgh/s3sync
+#    container_name: s3sync
+#    volumes:
+#      - /mnt/nextcloud:/data:ro
+#    env_file:
+#      - s3sync.env
+#    environment:
+#      SYNCDIR: "/data"
+#    command: "cron"
 
 volumes:
   db:
